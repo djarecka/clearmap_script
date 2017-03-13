@@ -4,7 +4,7 @@ Template to run the processing pipeline
 """
 
 #load the parameters:
-execfile('/scratch/Sat/djarecka/alex_files_170222_P4_Npas4/parameter_file_template.py')
+execfile('/clearmap_basedir/scripts/parameter_file_template.py')
 
 
 #resampling operations:

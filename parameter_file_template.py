@@ -5,7 +5,7 @@ Example script to set up the parameters for the image processing pipeline
 
 ######################### Import modules
 
-import os, numpy, math
+import os, numpy, math, json
 
 import ClearMap.Settings as settings
 import ClearMap.IO as io
@@ -22,26 +22,33 @@ from ClearMap.Analysis.Label import labelToName
 
 
 ######################### Data parameters
-
 #Directory to save all the results, usually containing the data for one sample
-BaseDirectory = '/scratch/Sat/djarecka/alex_files_170222_P4_Npas4'
-resource_dir = '/scratch/Sat/djarecka/alex_files_170222_P4_Npas4/mouse_brain_files'
+BaseDirectory = '/clearmap_basedir/output/'
+DataDirectory = '/clearmap_basedir/data/'
+resource_dir = '/clearmap_basedir/atlas/'
+
+with open(os.path.join(DataDirectory, 'settings.json')) as file:    
+    settings_dict = json.load(file)
+
 
 #Data File and Reference channel File, usually as a sequence of files from the microscope
 #Use \d{4} for 4 digits in the sequence for instance. As an example, if you have cfos-Z0001.ome.tif :
 #os.path.join() is used to join the BaseDirectory path and the data paths:
-cFosFile = os.path.join(BaseDirectory, '170222_P4_Npas4_647_20-19-11', '20-19-11_P4_Npas4_647_UltraII_C00_xyz-Table Z\d{4}.ome.tif');
-AutofluoFile = os.path.join(BaseDirectory, '170222_P4_Npas4_488_21-14-19', '21-14-19_P4_Npas4_488_UltraII_C00_xyz-Table Z\d{4}.ome.tif');
+cFosFile = os.path.join(DataDirectory, settings_dict["cFosFile_name"]);
+AutofluoFile = os.path.join(DataDirectory, settings_dict["AutofluoFile_name"]);
 
 #Specify the range for the cell detection. This doesn't affect the resampling and registration operations
-cFosFileRange = {'x' : all, 'y' : all, 'z' : all};
+if "cFosFileRange" in settings_dict.keys():
+    cFosFileRange = settings_dict["cFosFileRange"];
+else:
+    cFosFileRange = {'x' : all, 'y' : all, 'z' : all};
 
 #Resolution of the Raw Data (in um / pixel)
-OriginalResolution = (4.0625, 4.0625, 3); #(5.1587, 5.1587, 2.5);
+OriginalResolution = settings_dict["OriginalResolution"]
 
 #Orientation: 1,2,3 means the same orientation as the reference and atlas files.
 #Flip axis with - sign (eg. (-1,2,3) flips x). 3D Rotate by swapping numbers. (eg. (2,1,3) swaps x and y)
-FinalOrientation = (2, -1, 3); #(1,2,3);
+FinalOrientation = settings_dict["FinalOrientation"]
 
 #Resolution of the Atlas (in um/ pixel)
 AtlasResolution = (25, 25, 25);
